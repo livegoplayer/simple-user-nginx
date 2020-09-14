@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash
 
 source /sh/init_nginx_env.sh
 
