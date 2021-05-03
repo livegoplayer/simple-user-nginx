@@ -119,7 +119,7 @@ spec:
           claimName: app-pvc-claim
       - name: nginx-conf
         configMap:
-          name: user-nginx-config-map
+          name: vue-user-nginx-config-map
           items:
           - key: nginx.conf
             path: conf/nginx/nginx.conf
