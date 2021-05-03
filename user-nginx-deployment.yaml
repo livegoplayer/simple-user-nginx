@@ -1,7 +1,28 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vue_user
+  labels:
+    istio-injection: enabled
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: user-imroc-io
+  namespace: vue_user
+spec:
+  secretName: vue-user-imroc-io-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - vue.user.k8s.show
+---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: app-sc
+  namespace: vue_user
 reclaimPolicy: Retain
 volumeBindingMode: Immediate
 provisioner: kubernetes.io/no-provisioner
@@ -10,6 +31,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: vue-user-app-p-volume
+  namespace: vue_user
   labels:
     type: app
 spec:
@@ -20,12 +42,13 @@ spec:
     - ReadWriteMany
   nfs:
     path: /apps
-    server: 139.224.132.234
+    server: localhost.kvm-1
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: app-pvc-claim
+  namespace: vue_user
 spec:
   storageClassName: app-sc
   accessModes:
@@ -44,6 +67,7 @@ metadata:
   labels:
     io.kompose.service: vue-user
   name: vue-user
+  namespace: vue_user
 spec:
   replicas: 1
   selector:
@@ -111,6 +135,7 @@ metadata:
   labels:
     io.kompose.service: vue-user
   name: vue-user-server
+  namespace: vue_user
 spec:
   ports:
   - name: vue-user-server-main-port
@@ -119,25 +144,60 @@ spec:
   selector:
     io.kompose.service: vue-user
 ---
-
-apiVersion: extensions/v1beta1
-kind: Ingress
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
 metadata:
-  name: vue-user-ingress
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
+  name:  user-gw
+  namespace: vue_user
+  labels:
+    app: user
+    io.kompose.service: user
 spec:
-  rules:
-  - host: user.52db.club
-    http:
-      paths:
-      - backend:
-          serviceName: vue-user-server
-          servicePort: 80
-        path: /
-  tls:
-   - secretName: user-imroc-io-tls
-     hosts:
-       - user.52db.club
-
+  selector:
+    istio: ingressgateway
+  servers:
+    - hosts:
+        - vue.user.k8s.show
+      tls:
+        mode: SIMPLE
+        credentialName: vue-user-imroc-io-tls
+      port:
+        number: 443
+        name: vue-user-dashboard-https
+        protocol: HTTPS
+    - hosts:
+        - vue.user.k8s.show
+      port:
+        number: 80
+        name: vue-user-dashboard-http
+        protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: user-dr
+  namespace: vue_user
+spec:
+  host: user.user.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: user-vs
+  namespace: vue_user
+spec:
+  hosts:
+    - vue.user.k8s.show
+  gateways:
+    - user-gw
+  http:
+    - match: null
+      route:
+        - destination:
+            host: "user.user.svc.cluster.local"
+            port:
+              number: 80
 
