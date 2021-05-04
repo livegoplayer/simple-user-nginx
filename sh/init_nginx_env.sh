@@ -59,7 +59,7 @@ if [[ -z $WORKER_RLIMIT_NOFILE  ]]
 then
 	fileMax=$(cat /proc/sys/fs/file-max)
 	unlimit=$(ulimit -n)
-	if [[ fileMax>unlimit ]]
+	if [[ $fileMax -gt $unlimit ]]
 	then
 		WORKER_RLIMIT_NOFILE=$unlimit
 	else
