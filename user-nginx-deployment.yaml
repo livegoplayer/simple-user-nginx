@@ -127,7 +127,7 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: vue-user
-  name: vue-user-server
+  name: vue-user
   namespace: vue-user
 spec:
   ports:
@@ -171,7 +171,7 @@ metadata:
   name: user-dr
   namespace: vue-user
 spec:
-  host: user.vue-user.svc.cluster.local
+  host: vue-user.vue-user.svc.cluster.local
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
@@ -190,7 +190,7 @@ spec:
     - match: null
       route:
         - destination:
-            host: "user.vue-user.svc.cluster.local"
+            host: vue-user.vue-user.svc.cluster.local
             port:
               number: 80
 
