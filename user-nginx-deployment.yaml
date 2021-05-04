@@ -178,7 +178,7 @@ metadata:
   name: user-dr
   namespace: vue-user
 spec:
-  host: user.user.svc.cluster.local
+  host: user.vue-user.svc.cluster.local
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
@@ -197,7 +197,7 @@ spec:
     - match: null
       route:
         - destination:
-            host: "user.user.svc.cluster.local"
+            host: "user.vue-user.svc.cluster.local"
             port:
               number: 80
 
