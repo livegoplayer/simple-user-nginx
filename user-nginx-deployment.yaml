@@ -9,7 +9,7 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-    - vue.user.k8s.show
+    - vue-user.k8s.show
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -150,7 +150,7 @@ spec:
     istio: ingressgateway
   servers:
     - hosts:
-        - vue.user.k8s.show
+        - vue-user.k8s.show
       tls:
         mode: SIMPLE
         credentialName: vue-user-imroc-io-tls
@@ -159,7 +159,7 @@ spec:
         name: vue-user-dashboard-https
         protocol: HTTPS
     - hosts:
-        - vue.user.k8s.show
+        - vue-user.k8s.show
       port:
         number: 80
         name: vue-user-dashboard-http
@@ -183,7 +183,7 @@ metadata:
   namespace: vue-user
 spec:
   hosts:
-    - vue.user.k8s.show
+    - vue-user.k8s.show
   gateways:
     - user-gw
   http:

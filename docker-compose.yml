@@ -5,7 +5,7 @@ services:
       build: ./
       container_name: go_user_nginx
       environment:
-         USER_SERVER_NAME: "vue.user.k8s.show"
+         USER_SERVER_NAME: "vue-user.k8s.show"
          RESTY_CONFIG_OPTIONS_MORE: "--with-echo_nginx_module"
       ports:
          - "80:80"
